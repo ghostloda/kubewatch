@@ -56,6 +56,7 @@ type Event struct {
 	eventType    string
 	namespace    string
 	resourceType string
+	uid          string
 }
 
 // Controller object
@@ -536,6 +537,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.eventType = "delete"
 			newEvent.resourceType = resourceType
 			newEvent.namespace = utils.GetObjectMetaData(obj).Namespace
+			newEvent.uid = string(utils.GetObjectMetaData(obj).UID)
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing delete to %v: %s", resourceType, newEvent.key)
 			if err == nil {
 				queue.Add(newEvent)
@@ -690,6 +692,7 @@ func (c *Controller) processItem(newEvent Event) error {
 			Kind:      newEvent.resourceType,
 			Status:    "Danger",
 			Reason:    "Deleted",
+			UID:       newEvent.uid,
 		}
 		c.eventHandler.Handle(kbEvent)
 		return nil
