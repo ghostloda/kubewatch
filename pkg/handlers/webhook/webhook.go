@@ -57,6 +57,7 @@ type WebhookMessage struct {
 
 // EventMeta containes the meta data about the event occurred
 type EventMeta struct {
+	ClusterID string `json:"cluster_id"`
 	Kind      string `json:"kind"`
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
@@ -101,6 +102,7 @@ func checkMissingWebhookVars(s *Webhook) error {
 func prepareWebhookMessage(e event.Event, m *Webhook) *WebhookMessage {
 	return &WebhookMessage{
 		EventMeta: EventMeta{
+			ClusterID: e.ClusterID,
 			Kind:      e.Kind,
 			Name:      e.Name,
 			Namespace: e.Namespace,
