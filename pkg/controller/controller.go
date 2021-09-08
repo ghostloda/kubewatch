@@ -52,6 +52,7 @@ var serverStartTime time.Time
 
 // Event indicate the informerEvent
 type Event struct {
+	clusterID    string
 	key          string
 	eventType    string
 	namespace    string
@@ -512,6 +513,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 func newResourceController(client kubernetes.Interface, eventHandler handlers.Handler, informer cache.SharedIndexInformer, resourceType string) *Controller {
 	queue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 	var newEvent Event
+	newEvent.clusterID = os.Getenv("clusterID")
 	var err error
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
@@ -657,6 +659,7 @@ func (c *Controller) processItem(newEvent Event) error {
 				status = "Normal"
 			}
 			kbEvent := event.Event{
+				ClusterID: newEvent.clusterID,
 				Name:      objectMeta.Name,
 				Namespace: newEvent.namespace,
 				Kind:      newEvent.resourceType,
@@ -677,6 +680,7 @@ func (c *Controller) processItem(newEvent Event) error {
 			status = "Warning"
 		}
 		kbEvent := event.Event{
+			ClusterID: newEvent.clusterID,
 			Name:      newEvent.key,
 			Namespace: newEvent.namespace,
 			Kind:      newEvent.resourceType,
@@ -687,6 +691,7 @@ func (c *Controller) processItem(newEvent Event) error {
 		return nil
 	case "delete":
 		kbEvent := event.Event{
+			ClusterID: newEvent.clusterID,
 			Name:      newEvent.key,
 			Namespace: newEvent.namespace,
 			Kind:      newEvent.resourceType,

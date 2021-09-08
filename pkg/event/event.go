@@ -28,6 +28,7 @@ import (
 // Events from different endpoints need to be casted to KubewatchEvent
 // before being able to be handled by handler
 type Event struct {
+	ClusterID string
 	Namespace string
 	Kind      string
 	Component string
